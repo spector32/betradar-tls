@@ -28,8 +28,33 @@
           <div class="col-md-12">
             <div id="content" class="content loading">
               <div class="lds-dual-ring heartbeat"></div>
+              <div class="row mb-5">
+                <div class="col-md-4" style="margin: 0 auto 25px auto">
+                  <form id="subscribe_match">
+                    <div class="input-group">
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="match_id"
+                        placeholder="Match ID"
+                      />
+                      <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                          Subscribe
+                        </button>
+                      </span>
+                    </div>
+                  </form>
+
+                  <!-- /input-group -->
+                </div>
+              </div>
               <!-- Nav tabs -->
-              <ul id="tab-list" class="nav nav-pills nav-fill" role="tablist"></ul>
+              <ul
+                id="tab-list"
+                class="nav nav-pills nav-fill"
+                role="tablist"
+              ></ul>
 
               <!-- Tab panes -->
               <div id="tab-content" class="tab-content"></div>

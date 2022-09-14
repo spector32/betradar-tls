@@ -16,7 +16,19 @@ const tlsSocket = new TLSXMLClient({
 });
 
 webSocket.on("message", (msg) => {
+  const msgString = msg.toString();
   console.log("Message from WS: ", msg.toString());
+
+  if (msgString.startsWith("subscribe_match:")) {
+    const part = msgString.split("subscribe_match:");
+    if (part.length > 1) {
+      const matchId = part[1];
+      // <match matchid="944423"/>
+      console.log("Subscribing to match: ", matchId);
+      const matchById = `<match matchid="${matchId}" />`;
+      tlsSocket.send(matchById);
+    }
+  }
 });
 
 webSocket.on("error", (error) => {
@@ -25,9 +37,8 @@ webSocket.on("error", (error) => {
 
 tlsSocket.on("authenticated", () => {
   const matchListRequest = `<matchlist hoursback="1" hoursforward="1" includeavailable="yes"/>`;
-//   const matchId = `<match matchid="36044657" feedtype="delta"/>`;
   setInterval(() => {
-    tlsSocket.send(matchListRequest || matchId);
+    tlsSocket.send(matchListRequest);
   }, 10000);
 });
 

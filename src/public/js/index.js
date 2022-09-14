@@ -5,8 +5,8 @@
 
   socket.onopen = function (e) {
     console.log("[open] Connection established");
-    console.log("Sending to server");
-    socket.send("Client connected from WEB: ", e);
+    console.log("Waiting for response");
+    socket.send("Client connected");
   };
 
   const tableElements = {};
@@ -39,6 +39,7 @@
         dataTable: $(
           `<table id="${dataId}" class="table table-striped table-bordered" style="width:100%" />`
         ),
+        latestData: data,
       };
 
       $("#tab-list", document).append(tabItem.handle);
@@ -58,6 +59,7 @@
               data: key,
               name: key,
               title: key,
+              // width: 130,
             }));
           }
 
@@ -69,6 +71,7 @@
                 data: i,
                 name: i,
                 title: i,
+                // width: "130px",
               });
             }
             return c;
@@ -103,6 +106,16 @@
     }
   }
 
+  const sunscribtion_form = $("#subscribe_match", document);
+  sunscribtion_form.on("submit", (event) => {
+    event.preventDefault();
+    const input = $("#match_id", document);
+    const value = input.val();
+    input.val("");
+
+    socket.send("subscribe_match:" + value);
+  });
+
   socket.onmessage = function (event) {
     if (event.data) {
       let data;
@@ -117,18 +130,26 @@
       if (data) {
         const dataKeys = Object.keys(data);
         for (const key of dataKeys) {
+          const normalized = data[key];
           switch (key) {
             case "matchlist":
-              if (data[key].match && data[key].match.length > 0) {
+              if (normalized.match && normalized.match.length > 0) {
                 renderTableFromDataArray(
                   key,
-                  data[key].match,
+                  normalized.match,
                   false,
                   function (e, dt, type, indexes) {
                     var data = dt.rows(indexes).data();
                     console.log(data);
                   }
                 );
+              }
+              break;
+            case "matchstop":
+              if(normalized.reason){
+                alert(normalized.reason);
+              } else {
+                console.log("Can't access match");
               }
               break;
             default:

@@ -110,6 +110,8 @@ table {
   background: rgba(200, 200, 200, 0.45);
 }
 
-table thead th {
-  width: auto !important;
+table thead th,
+table tbody td {
+  min-width: 162px !important;
+  white-space: nowrap;
 }
