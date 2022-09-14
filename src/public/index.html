@@ -2,28 +2,50 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Sample Site</title>
+    <title>Tennis 2022</title>
     <link
       rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
-      crossorigin="anonymous"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
     />
-    <style>
-      body {
-        padding-top: 50px;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/jqwidgets/14.0.0/jqwidgets/styles/jqx.base.min.css"
+      integrity="sha512-oqfScnAKrfZRqF4PSJtiZ0TnEgegI5F313JSCxFegHWdhScorKmc2vs57Vb2f4mnGetOSPUVXtwASFsP/rRgFA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="css/index.css" />
   </head>
   <body>
-    <div class="container">
-      <div class="jumbotron">
-        <h1>res.sendFile() Works!</h1>
+    <div class="container content-container">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="content" class="content loading">
+              <div class="lds-dual-ring heartbeat"></div>
+              <!-- Nav tabs -->
+              <ul id="tab-list" class="nav nav-pills nav-fill" role="tablist"></ul>
+
+              <!-- Tab panes -->
+              <div id="tab-content" class="tab-content"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <script
-      src="http://localhost:8000/js/index.js"
-      type="text/javascript"
+      src="https://code.jquery.com/jquery-3.6.1.slim.min.js"
+      integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA="
+      crossorigin="anonymous"
     ></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap.min.js"></script>
+    <script src="js/index.js" type="text/javascript"></script>
   </body>
 </html>

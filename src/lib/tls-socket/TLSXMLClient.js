@@ -1,4 +1,5 @@
-// const fs = require("fs");
+const fs = require("fs");
+const path = require("path");
 const tls = require("tls");
 const EventEmitter = require("events");
 const PassThrough = require("stream").PassThrough;
@@ -176,8 +177,23 @@ class TLSXMLClient extends EventEmitter {
     try {
       result = JSON.parse(convert.toJson(message));
     } catch (e) {
-      console.log("e.message: ", e.message, message);
-      console.log(message);
+      console.log("e.message: ", e.message);// message.toString()
+      const W_TO_FILE = false;
+      if(W_TO_FILE){
+      const fileName = path.join(
+        path.resolve(__dirname, `../../..`),
+        `logs/xml/xml-with-errors-${Date.now()}.xml`
+      );
+      try {
+        fs.writeFile(fileName, message.toString(), () => {
+          console.log("Written to file: ", fileName);
+        });
+        // file written successfully
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
       //   throw e;
     }
 
