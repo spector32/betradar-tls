@@ -1,10 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&display=swap');
+
+
 body {
-  background-image: url("../img/tennis-bg.jpg");
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
-  background-position: center;
+  background: #015640;
   padding-top: 50px;
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+
 }
 
 .content-container {
@@ -13,7 +15,7 @@ body {
   min-height: 80vh;
   backdrop-filter: blur(5px);
   border-radius: 10px;
-  border: 1px dashed #320099;
+  
   z-index: 1;
   padding: 10px;
 }
@@ -43,8 +45,8 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  mergin-top: -40px;
-  mergin-left: -40px;
+  margin-top: -40px;
+  margin-left: -40px;
 }
 
 .lds-dual-ring:after {
@@ -114,4 +116,100 @@ table thead th,
 table tbody td {
   min-width: 162px !important;
   white-space: nowrap;
+}
+
+
+#TIME {
+  text-align: center;
+  font-size: 47px;
+  font-weight: 700;
+  margin-top: -25px;
+  margin-bottom: 39px;
+}
+.bg-white{
+  background: #fff;
+  padding: 0px;
+  text-align: center;
+}
+.icon_flag {
+  width: 70px;
+  float: left;
+  margin: 20px 29px 0 0;
+}
+.country {
+  font-size: 27px;
+  margin-bottom: -16px;
+}
+.player_name {
+  font-size: 38px;
+  font-weight: bold;
+}
+.player {
+  display: inline-block;
+    width: 560px;
+}
+
+.points {
+  font-size: 50px;
+    font-weight: bold;
+    
+    padding: 13px 17px;
+    color: #fff;
+    line-height: 0;
+    margin: 0 15px 0 0;
+}
+
+/*.points::before {
+  content: "POINTS";
+  position: absolute;
+  top: -48px;
+  right: 255px;
+  font-size: 15px;
+  color: #fff;
+  font-weight: 500;
+}*/
+
+.sets {
+  font-size: 50px;
+    font-weight: bold;
+    background: #fff;
+    padding: 13px 17px;
+    color: #008866;
+    line-height: 0;
+    margin: 0 20px 0 0;
+}
+
+.s1::before {
+  content: "G";
+  position: absolute;
+  top: -68px;
+  right: 145px;
+  font-size: 25px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.s2::before {
+  content: "2ND";
+  position: absolute;
+  top: -48px;
+  right: 129px;
+  font-size: 15px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.s3::before {
+  content: "S";
+  position: absolute;
+  top: -68px;
+  right: 59px;
+  font-size: 25px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.border {
+  border-bottom: 3px solid #008866;
+  padding-bottom: 21px;
 }

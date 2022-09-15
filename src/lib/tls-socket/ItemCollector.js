@@ -5,41 +5,53 @@ class ItemCollector extends stream.Transform {
     super({ objectMode: true });
 
     this.__buffer = null;
-    this.__chunkSize = 0;
-  }
-
-  __collectToBuffer(chunk) {
-    const chunkBuffer = Buffer.from(chunk);
-    this.__buffer = !this.__buffer
-      ? chunkBuffer
-      : Buffer.concat(
-          [this.__buffer, chunkBuffer],
-          this.__buffer.length + chunk.length
-        );
+    this.lastString = "";
   }
 
   _transform(chunk, encoding, callback) {
-    const str = chunk.toString();
-    if (/\r\n\r\n$/gim.test(str)) {
-      this.__collectToBuffer(chunk);
-      const cleanChunk = this.__buffer
-        .toString()
-        .replace(/[\r\n\t]/gm, "")
-        .replace(/>\s*/g, ">")
-        .replace(/\s*</g, "<");
-      callback(null, cleanChunk);
-      this.__buffer = null;
-      this.__chunkSize = 0;
-    } else {
-      this.__collectToBuffer(chunk);
-      callback(null);
+    const chunkString = chunk.toString();
+    this.lastString = chunkString;
+    if (chunkString.trim() === "<ct/>") {
+      callback();
+      return;
     }
+
+    let str = "";
+    if (
+      this.__buffer &&
+      !this.__buffer.trim().endsWith(">") &&
+      chunkString.startsWith("<")
+    ) {
+      str = chunk.toString();
+    } else {
+      str = (this.__buffer || "") + chunk.toString();
+    }
+
+    if (str.trim().startsWith("<")) {
+      if (str.trim().endsWith(">")) {
+        if (/\r\n\r\n$/gim.test(str)) {
+          const msgX2 = str.split("\r\n\r\n");
+          for (const msX of msgX2) {
+            if (msX.trim().startsWith("<") && msX.trim().endsWith(">")) {
+              this.push(msX);
+            }
+          }
+        } else {
+          this.push(str);
+        }
+      } else {
+        this.__buffer = str;
+      }
+    } else {
+      this.__buffer = str;
+    }
+    callback();
+    return;
   }
 
   _flush() {
     console.log("Flushing...");
     this.__buffer = null;
-    this.__chunkSize = 0;
     console.log("Done");
   }
 }

@@ -25,19 +25,18 @@ class TLSXMLClient extends EventEmitter {
         config.host,
         config.options,
         () => {
-          console.log(`Connected to: tcp://${config.host}:${config.port}`);
+          console.log(`\nConnected to: tcp://${config.host}:${config.port}`);
           if (this.socket.authorized) {
-            console.log("Connection authorized by a Certificate Authority.");
+            console.log("\nConnection authorized by a Certificate Authority.");
           } else {
             console.log(
-              "Connection not authorized: " + this.socket.authorizationError
+              "\nConnection not authorized: " + this.socket.authorizationError
             );
           }
 
           this.socket.setEncoding("utf8");
 
           const { credentials } = config;
-
           const authenticationRequest = `
                 <?xml version="1.0" encoding="utf-8"?>
                 <login>
@@ -47,28 +46,15 @@ class TLSXMLClient extends EventEmitter {
                     </credential>
                 </login>`;
 
-          console.log("Authenticating...");
+          console.log("\nAuthenticating...");
           this.socket.write(authenticationRequest + "\n", (error) => {
             if (error) {
-              console.log("Authentication error");
+              console.log("\nAuthentication error");
               console.error(error);
             } else {
-              console.log("Authenticatied");
+              console.log("\nAuthenticatied");
             }
           });
-
-          this.socket.write(
-            '<matchlist hoursback="1" hoursforward="1" includeavailable="yes"/>' +
-              "\n",
-            (error) => {
-              if (error) {
-                console.log("matchlist error");
-                console.error(error);
-              } else {
-                // console.log("match got");
-              }
-            }
-          );
         }
       );
 
@@ -78,10 +64,10 @@ class TLSXMLClient extends EventEmitter {
       this.socket.pipe(collectorStream).pipe(stream);
 
       stream.on("data", (message) => {
-        const data = this.transpileXmlMessage(message);
+        const data = this.transpileXmlMessage(message.toString(), collectorStream);
 
         if (data === null) {
-          console.log("No data");
+          console.log("\nNo data");
           return;
         }
 
@@ -91,52 +77,23 @@ class TLSXMLClient extends EventEmitter {
         }
 
         if (this.isAuthenticated) {
-          if ("ct" in data) {
-            // console.log("ping");
-          }
-          //   else if (message) {
-          //     this.requests.client_handleResponse(message, this);
-          //   } else if (message.responseId) {
-          //     this.requests.handleRequest(message);
-          //   }
-          else {
-            if (data) {
-              this.emit("message", data);
-            }
-            // console.log("Else message: ", message);
-            // if (false && message) {
-            //   // keep alive
-            //   this.send('<?xml version="1.0" encoding="utf-8"?>\n<ct/>');
-            // } else {
-            //   // regular message
-            //   this.emit("message", message);
+          if (data) {
+            process.stdout.write(".");
+            this.emit("message", data);
           }
         } else {
           if (data.login) {
             const element = data.login;
             if (element.result === "valid") {
               this.isAuthenticated = true;
-              // this.user = data.user;
-              // console.log("this.user: ", data.user);
               this.emit("authenticated");
             }
           }
         }
       });
 
-      //   stream.on("finish", () => {
-      //     const buffer = Buffer.concat(chunks, totalChunkSize);
-      //     // console.log("Finish", buffer.toString());
-      //     try {
-      //       fs.writeFileSync("./test.xml", buffer.toString());
-      //       // file written successfully
-      //     } catch (err) {
-      //       console.error(err);
-      //     }
-      //   });
-
       stream.on("end", (message) => {
-        console.log("Stream end", message);
+        console.log("\nStream end", message);
       });
 
       this.socket.on("connect", () => {
@@ -172,27 +129,28 @@ class TLSXMLClient extends EventEmitter {
     this.connect();
   }
 
-  transpileXmlMessage(message) {
+  transpileXmlMessage(message, strm) {
     let result = null;
     try {
       result = JSON.parse(convert.toJson(message));
     } catch (e) {
-      console.log("e.message: ", e.message);// message.toString()
-      const W_TO_FILE = false;
-      if(W_TO_FILE){
-      const fileName = path.join(
-        path.resolve(__dirname, `../../..`),
-        `logs/xml/xml-with-errors-${Date.now()}.xml`
-      );
-      try {
-        fs.writeFile(fileName, message.toString(), () => {
-          console.log("Written to file: ", fileName);
-        });
-        // file written successfully
-      } catch (err) {
-        console.error(err);
+      console.log("\nParsing rrror message: ", e.message); // message.toString()
+      console.log("\nLast parsing XML message: ", strm.lastString);
+      const W_TO_FILE = true;
+      if (W_TO_FILE) {
+        const fileName = path.join(
+          path.resolve(__dirname, `../../..`),
+          `logs/xml/xml-with-errors-${Date.now()}.xml`
+        );
+        try {
+          fs.writeFile(fileName, message.toString(), () => {
+            console.log("\nWritten to file: ", fileName);
+          });
+          // file written successfully
+        } catch (err) {
+          console.error(err);
+        }
       }
-    }
 
       //   throw e;
     }
@@ -216,7 +174,7 @@ class TLSXMLClient extends EventEmitter {
     if (this.socket && this.isAuthenticated) {
       this.socket.write(message + "\n");
     } else {
-      this.emit("error", new Error("not connected or not authenticated"));
+      this.emit("error", new Error("Not connected or not authenticated"));
     }
   }
 
@@ -224,7 +182,7 @@ class TLSXMLClient extends EventEmitter {
     if (this.socket && this.isAuthenticated) {
       return await this.requests.sendRequest(object, this.socket);
     } else {
-      const err = new Error("not connected or not authenticated");
+      const err = new Error("Not connected or not authenticated");
       return Promise.reject(err);
     }
   }

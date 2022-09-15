@@ -5,117 +5,23 @@
 
   socket.onopen = function (e) {
     console.log("[open] Connection established");
-    console.log("Waiting for response");
+    console.log("Waiting for response...");
+    socket.send("session:start");
     socket.send("Client connected");
-  };
 
-  const tableElements = {};
-
-  function renderTableFromDataArray(
-    dataId,
-    data,
-    forceRedraw = false,
-    rowClickCb = null
-  ) {
-    {
-      if (tableElements[dataId]) {
-        if (forceRedraw) {
-          $(tableElements[dataId]).remove();
-        } else {
-          return;
+    setTimeout(() => {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams) {
+        const matchId = searchParams.get("matchId");
+        if (matchId && matchId.trim()) {
+          console.log("Subscribtion request sent");
+          socket.send("subscribe_match:" + matchId);
         }
       }
+    }, 1000);
+  };
 
-      const tabItem = {
-        handle: $(`<li class="nav-link active">
-                    <a href="#tab-${dataId}" role="tab" data-toggle="tab">
-                      <span>${dataId}</span></span>
-                    </a>
-                  </li>`),
-        content: $(`<div class="tab-pane active" id="tab-${dataId}">
-                <div id="json-table-${dataId}" class="json-table-a margin-bottom"></div>
-                <code id="json-code-${dataId}">N\\A</code>
-              </div>`),
-        dataTable: $(
-          `<table id="${dataId}" class="table table-striped table-bordered" style="width:100%" />`
-        ),
-        latestData: data,
-      };
-
-      $("#tab-list", document).append(tabItem.handle);
-      $("#tab-content", document).append(tabItem.content);
-      $(`#json-table-${dataId}`, tabItem.content).append(tabItem.dataTable);
-      tabItem.handle.siblings().removeClass("active");
-      tabItem.content.siblings().removeClass("active");
-
-      tableElements[dataId] = tabItem;
-
-      let foundColumns = [];
-      const TABLE_DATA = data.reduce(
-        (current, item) => {
-          if (!current.columns.length) {
-            foundColumns = Object.keys(item);
-            current.columns = foundColumns.map((key) => ({
-              data: key,
-              name: key,
-              title: key,
-              // width: 130,
-            }));
-          }
-
-          const newItem = Object.keys(item).reduce((c, i) => {
-            if (typeof c[i] === "object") c[i] = JSON.stringify(c[i]);
-            if (!foundColumns.includes(i)) {
-              foundColumns.push(i);
-              current.columns.push({
-                data: i,
-                name: i,
-                title: i,
-                // width: "130px",
-              });
-            }
-            return c;
-          }, item);
-
-          current.data.push(newItem);
-          return current;
-        },
-        { columns: [], data: [] }
-      );
-
-      const table = tabItem.dataTable.DataTable({
-        scrollX: true,
-        scrollY: true,
-        select: {
-          toggleable: false,
-        },
-        data: TABLE_DATA.data.map((item) => {
-          for (const column of TABLE_DATA.columns) {
-            if (!(column.name in item)) {
-              item[column.name] = "N/A";
-            }
-          }
-          return item;
-        }),
-        columns: TABLE_DATA.columns,
-      });
-
-      if (typeof rowClickCb === "function") {
-        tabItem.dataTable.on("select.dt", rowClickCb);
-      }
-    }
-  }
-
-  const sunscribtion_form = $("#subscribe_match", document);
-  sunscribtion_form.on("submit", (event) => {
-    event.preventDefault();
-    const input = $("#match_id", document);
-    const value = input.val();
-    input.val("");
-
-    socket.send("subscribe_match:" + value);
-  });
-
+  // ŠEIT NĀK MESSAGES NO SOKETA
   socket.onmessage = function (event) {
     if (event.data) {
       let data;
@@ -127,38 +33,60 @@
         console.log(e.message);
       }
 
+      // data mainīgais satur JSON objektu ar datiem
       if (data) {
+        // MOST IMPORTANT
         const dataKeys = Object.keys(data);
         for (const key of dataKeys) {
           const normalized = data[key];
           switch (key) {
             case "matchlist":
-              if (normalized.match && normalized.match.length > 0) {
-                renderTableFromDataArray(
-                  key,
-                  normalized.match,
-                  false,
-                  function (e, dt, type, indexes) {
-                    var data = dt.rows(indexes).data();
-                    console.log(data);
-                  }
-                );
-              }
+              //
+              break;
+            case "match":
+              if (normalized.feedtype === "delta") return;
+
+              const matchtime = normalized.matchtime;
+
+              const homeName = normalized.t1name;
+              const guestsName = normalized.t2name;
+
+              const setsHome = normalized.score[0].t1;
+              const pointsHome = normalized.score[1].t1;
+              const setsGuests = normalized.score[0].t2;
+              const pointsGuests = normalized.score[1].t2;
+
+              let arrayCount = normalized.score.length - 1;
+
+              const firstSetGuests = normalized.score[arrayCount].t2;
+              const firstSetHome = normalized.score[arrayCount].t1;
+
+              $("#t1name").html(homeName);
+              $("#t2name").html(guestsName);
+
+              $("#TIME").html(matchtime);
+              $("#1stHome").html(firstSetHome);
+              $("#setsHome").html(setsHome);
+              $("#pointsHome").html(pointsHome);
+
+              $("#1stGuests").html(firstSetGuests);
+              $("#setsGuests").html(setsGuests);
+              $("#pointsGuests").html(pointsGuests);
+
               break;
             case "matchstop":
-              if(normalized.reason){
-                alert(normalized.reason);
+              if (normalized.reason) {
+                console.error(normalized.reason);
               } else {
-                console.log("Can't access match");
+                console.error("Can't access match");
               }
+              break;
+            case "matchdata":
+              //
               break;
             default:
               console.log("Unspecified key: ", key);
           }
-        }
-
-        if (Object.keys(tableElements).length > 0) {
-          $("#content", document).removeClass("loading");
         }
       }
     }
@@ -172,7 +100,7 @@
     } else {
       // e.g. server process killed or network down
       // event.code is usually 1006 in this case
-      console.log("[close] Connection died");
+      console.log("[close] Connection closed");
     }
   };
 
