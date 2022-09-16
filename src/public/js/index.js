@@ -57,12 +57,12 @@
               let pointsHome = normalized.score[1].t1;
               let pointsGuests = normalized.score[1].t2;
 
-              if(firstSetGuests == 50) {
-                firstSetGuests = 'A'
+              if(pointsHome == 50) {
+                pointsHome = 'A'
               }
 
-              if(firstSetGuests == 50) {
-                firstSetGuests = 'A'
+              if(pointsGuests == 50) {
+                pointsGuests = 'A'
               }
 
               const arrayCount = normalized.score.length - 1;
