@@ -52,11 +52,20 @@
               const guestsName = normalized.t2name;
 
               const setsHome = normalized.score[0].t1;
-              const pointsHome = normalized.score[1].t1;
               const setsGuests = normalized.score[0].t2;
-              const pointsGuests = normalized.score[1].t2;
 
-              let arrayCount = normalized.score.length - 1;
+              let pointsHome = normalized.score[1].t1;
+              let pointsGuests = normalized.score[1].t2;
+
+              if(firstSetGuests == 50) {
+                firstSetGuests = 'A'
+              }
+
+              if(firstSetGuests == 50) {
+                firstSetGuests = 'A'
+              }
+
+              const arrayCount = normalized.score.length - 1;
 
               const firstSetGuests = normalized.score[arrayCount].t2;
               const firstSetHome = normalized.score[arrayCount].t1;
@@ -88,7 +97,7 @@
               console.log("Unspecified key: ", key);
           }
         }
-      }
+      } 
     }
   };
 
